@@ -1838,11 +1838,18 @@ class Interface(object):
 
         mouse_kind = renpy.display.focus.get_mouse() # str|None
 
+        default_mouse = getattr(renpy.store, 'default_mouse', 'default')
+
         if interaction and (mouse_kind is None):
             mouse_kind = self.mouse
 
         if mouse_kind is None:
             mouse_kind = "default"
+
+        elif default_mouse != "default": # append default as suffix if in cache
+            suffixed = "{}_{}".format(mouse_kind, default_mouse)
+            if suffixed in self.cursor_cache: # type: ignore
+                mouse_kind = suffixed
 
         if pygame.mouse.get_pressed()[0]:
             mouse_kind = "pressed_" + mouse_kind # type: ignore
@@ -1862,7 +1869,7 @@ class Interface(object):
                 mouse_kind = 'default'
 
         if mouse_kind == 'default':
-            mouse_kind = getattr(renpy.store, 'default_mouse', 'default')
+            mouse_kind = default_mouse
 
         return mouse_kind
 
